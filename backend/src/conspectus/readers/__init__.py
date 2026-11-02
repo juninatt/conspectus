@@ -3,5 +3,6 @@
 from conspectus.readers.base import Reader, ReaderError
 from conspectus.readers.factory import create_reader
 from conspectus.readers.json_reader import JsonReader
+from conspectus.readers.sqlite_reader import SqliteReader
 
-__all__ = ["JsonReader", "Reader", "ReaderError", "create_reader"]
+__all__ = ["JsonReader", "Reader", "ReaderError", "SqliteReader", "create_reader"]

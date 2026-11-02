@@ -15,7 +15,7 @@ coverage/
 
 # Local data and secrets
 *.db
-!backend/tests/fixtures/*.db
+!backend/examples/*.db
 .env
 .env.*
 !.env.example

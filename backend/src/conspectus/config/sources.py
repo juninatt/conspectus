@@ -8,12 +8,13 @@ references to the old id stop working.
 import re
 import unicodedata
 from pathlib import Path
-from typing import Any, Literal, Self
+from typing import Annotated, Any, Literal, Self
 
 import yaml
 from pydantic import (
     BaseModel,
     ConfigDict,
+    Discriminator,
     Field,
     ValidationError,
     field_validator,
@@ -34,12 +35,13 @@ def source_id(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", ascii_name.lower()).strip("-")
 
 
-class JsonSource(BaseModel):
+class _BaseSource(BaseModel):
+    """Fields shared by every source; each format adds its own."""
+
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     name: str
     description: str | None = None
-    format: Literal["json"]
     path: Path
     columns: dict[str, ColumnType] = Field(default_factory=dict)
 
@@ -55,8 +57,24 @@ class JsonSource(BaseModel):
         return name
 
 
-# Becomes a union discriminated by `format` as more readers are added.
-type Source = JsonSource
+class JsonSource(_BaseSource):
+    format: Literal["json"]
+
+
+class SqliteSource(_BaseSource):
+    format: Literal["sqlite"]
+    table: str | None = None
+    query: str | None = None
+
+    @model_validator(mode="after")
+    def _table_or_query(self) -> Self:
+        if (self.table is None) == (self.query is None):
+            raise ValueError("set exactly one of 'table' and 'query'")
+        return self
+
+
+# `format` decides which model – and so which fields – apply to a source.
+type Source = Annotated[JsonSource | SqliteSource, Discriminator("format")]
 
 
 class _SourcesFile(BaseModel):
@@ -124,6 +142,9 @@ def _describe(issue: ErrorDetails, data: dict[str, Any]) -> str:
         name = entry.get("name") if isinstance(entry, dict) else None
         parts.append(f"source {index + 1}" + (f" ('{name}')" if name else ""))
         location = location[2:]
+        # Issues inside a format-specific model start with the format name.
+        if location and isinstance(entry, dict) and location[0] == entry.get("format"):
+            location = location[1:]
     if location:
         parts.append(".".join(str(part) for part in location))
     return f"  - {', '.join(parts)}: {message}" if parts else f"  - {message}"

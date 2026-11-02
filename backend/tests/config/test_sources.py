@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from conspectus.config import ConfigError, load_sources, source_id
+from conspectus.config import ConfigError, SqliteSource, load_sources, source_id
 from conspectus.models import ColumnType
 
 
@@ -102,7 +102,7 @@ def test_rejects_missing_file(tmp_path: Path) -> None:
         ),
         (
             "sources: [{name: A, format: csv, path: a.json}]",
-            "source 1 \\('A'\\), format: Input should be 'json'",
+            "source 1 \\('A'\\): Input tag 'csv' .* expected tags: 'json', 'sqlite'",
         ),
         (
             "sources: [{name: A, format: json, path: a.json, columns: {x: text}}]",
@@ -137,3 +137,51 @@ def test_rejects_invalid_configuration(
 ) -> None:
     with pytest.raises(ConfigError, match=message):
         load_sources(write_config(tmp_path, content))
+
+
+def test_loads_sqlite_sources(tmp_path: Path) -> None:
+    path = write_config(
+        tmp_path,
+        """
+sources:
+  - name: Events
+    format: sqlite
+    path: app.db
+    table: events
+  - name: Daily events
+    format: sqlite
+    path: app.db
+    query: SELECT day, count(*) AS events FROM events GROUP BY day
+""",
+    )
+
+    table_source, query_source = load_sources(path)
+
+    assert isinstance(table_source, SqliteSource)
+    assert table_source.table == "events"
+    assert table_source.path == (tmp_path / "app.db").resolve()
+    assert isinstance(query_source, SqliteSource)
+    assert query_source.query is not None
+
+
+@pytest.mark.parametrize(
+    "fields",
+    ["", ", table: t, query: SELECT 1"],
+    ids=["neither", "both"],
+)
+def test_sqlite_source_needs_table_or_query(tmp_path: Path, fields: str) -> None:
+    path = write_config(
+        tmp_path, f"sources: [{{name: A, format: sqlite, path: a.db{fields}}}]"
+    )
+
+    with pytest.raises(ConfigError, match="set exactly one of 'table' and 'query'"):
+        load_sources(path)
+
+
+def test_json_source_rejects_sqlite_fields(tmp_path: Path) -> None:
+    path = write_config(
+        tmp_path, "sources: [{name: A, format: json, path: a.json, table: t}]"
+    )
+
+    with pytest.raises(ConfigError, match=r"source 1 \('A'\), table: Extra inputs"):
+        load_sources(path)

@@ -7,8 +7,11 @@
 #   name         Display name. The source id is derived from it:
 #                "Weather stations" -> "weather-stations".
 #   description  Optional.
-#   format       Data format. Supported: json
+#   format       Data format: json or sqlite.
 #   path         Data file. Relative paths are resolved from this file's folder.
+#   table        sqlite only: a table to read. Set either table or query.
+#   query        sqlite only: an SQL query to run. The database is opened
+#                read-only, so a query can never change it.
 #   columns      Optional. Sets the type of specific columns instead of
 #                inferring it: string, integer, number, boolean, date, datetime.
 #
@@ -24,3 +27,20 @@ sources:
     path: examples/measurements.json
     columns:
       samples: number
+
+  - name: Station readings
+    description: Readings every three hours, stored in SQLite
+    format: sqlite
+    path: examples/stations.db
+    table: readings
+
+  - name: Daily averages
+    description: Average temperature per station and day
+    format: sqlite
+    path: examples/stations.db
+    query: >
+      SELECT date(recorded) AS day, station,
+             round(avg(temperature), 1) AS avg_temperature
+      FROM readings
+      GROUP BY day, station
+      ORDER BY day, station

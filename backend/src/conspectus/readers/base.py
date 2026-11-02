@@ -1,5 +1,6 @@
 """The interface every reader implements."""
 
+from pathlib import Path
 from typing import Protocol
 
 from conspectus.models import Dataset
@@ -17,3 +18,7 @@ class Reader(Protocol):
     """
 
     def read(self) -> Dataset: ...
+
+    def watched_paths(self) -> list[Path]:
+        """Files whose changes mean the data may have changed (used for caching)."""
+        ...
