@@ -217,3 +217,38 @@ identically.
 
 **Known limitation:** all rows are loaded into memory; `limit` and
 `offset` are not yet pushed down into SQL.
+
+## 015 – Frontend stack and structure (2026-11-02)
+**Decision:**
+- React with TypeScript in strict mode, built with Vite; npm as package
+  manager.
+- oxlint for linting and Prettier for formatting. ESLint was the original
+  choice, but `typescript-eslint` does not support TypeScript 7, which the
+  Vite template now uses; oxlint is the template's default and includes the
+  React hooks rules.
+- TypeScript types for the API are generated from the backend's OpenAPI
+  schema (openapi-typescript, run in isolation because it requires
+  TypeScript 5) and committed. CI fails if they are out of date.
+- TanStack Query for data fetching; React Router for URLs per dataset.
+- Styling with CSS Modules and CSS variables as design tokens, no component
+  library.
+- The table loads the whole dataset and sorts and pages in the browser.
+- In development, Vite forwards `/api/…` to the backend.
+- Tests use Vitest, Testing Library and MSW to simulate the backend.
+- The app has one version: `frontend/package.json` matches
+  `backend/pyproject.toml`, checked in CI. This amends decision 009, which
+  kept the version in a single file.
+
+**Why:** Generated types turn API changes into compile errors instead of
+runtime bugs. TanStack Query handles loading, errors, caching and retries
+that would otherwise be hand-written. CSS variables keep full control of
+the design and make theming and dark mode (0.8.0) a matter of redefining
+tokens. Testing through the rendered UI with a simulated backend checks
+behaviour the way a user experiences it, without a running server.
+Forwarding `/api` gives the browser a single origin, so the backend needs
+no CORS configuration.
+
+**Shortcut, accepted:** sorting and paging in the browser works well up to
+a few thousand rows. When the API gains server-side sorting and filtering,
+the table switches to requesting one page at a time; the change stays inside
+the table component.

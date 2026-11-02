@@ -1,6 +1,7 @@
 # Conspectus
 
 [![Backend](https://github.com/juninatt/conspectus/actions/workflows/backend.yml/badge.svg)](https://github.com/juninatt/conspectus/actions/workflows/backend.yml)
+[![Frontend](https://github.com/juninatt/conspectus/actions/workflows/frontend.yml/badge.svg)](https://github.com/juninatt/conspectus/actions/workflows/frontend.yml)
 
 *Latin: "overview".*
 
@@ -94,12 +95,14 @@ booleans, but are accepted when a column is explicitly typed `boolean`.
 
 | Area     | Choice                                  |
 |----------|-----------------------------------------|
-| Backend  | Python, FastAPI, pytest                 |
-| Frontend | TypeScript, React, Vite, Vitest         |
-| Charts   | ECharts                                 |
-| Tables   | TanStack Table                          |
-| Storage  | SQLite locally, Postgres in the cloud   |
-| Tooling  | uv, ruff, mypy (strict)                 |
+| Backend  | Python, FastAPI, pytest |
+| Frontend | TypeScript (strict), React, Vite, React Router |
+| Data fetching | TanStack Query, with types generated from the API's OpenAPI schema |
+| Tables   | TanStack Table |
+| Charts   | ECharts (planned) |
+| Styling  | CSS Modules and CSS variables (design tokens) |
+| Storage  | SQLite locally, Postgres in the cloud (planned) |
+| Tooling  | uv, ruff, mypy · npm, oxlint, Prettier, Vitest, Testing Library, MSW |
 
 ## Getting started
 
@@ -117,6 +120,19 @@ uv run fastapi dev src/conspectus/main.py
 
 The API is then available at <http://localhost:8000>, with interactive
 documentation at <http://localhost:8000/docs>.
+
+### Frontend
+
+Requires [Node.js](https://nodejs.org/) 24 or later. Start the backend first.
+
+```bash
+cd frontend
+npm ci                                   # install exact locked dependencies
+npm run dev
+```
+
+Open <http://localhost:5173>. During development, requests to `/api/…` are
+forwarded to the backend on port 8000, so no CORS setup is needed.
 
 ## API
 
@@ -196,9 +212,13 @@ since the producing application may not have written them yet. Changes to
 
 ## Development
 
-All commands run from `backend/`. All checks must pass before a change is
-committed. The same checks run in CI (GitHub Actions) on every push to
-`main` and every pull request that touches the backend.
+All checks must pass before a change is committed. The same checks run in CI
+(GitHub Actions) on every push to `main` and every pull request, with one
+workflow for the backend and one for the frontend.
+
+### Backend
+
+Run from `backend/`:
 
 ```bash
 uv run pytest            # tests
@@ -209,26 +229,44 @@ uv add <package>         # add a runtime dependency
 uv add --dev <package>   # add a development dependency
 ```
 
+### Frontend
+
+Run from `frontend/`:
+
+```bash
+npm test                 # tests (Vitest)
+npm run lint             # lint (oxlint)
+npm run format           # format (Prettier)
+npm run typecheck        # type check (strict)
+npm run build            # production build
+npm run generate:api     # regenerate API types after backend API changes
+```
+
+`src/api/schema.d.ts` is generated from the backend's OpenAPI schema and is
+committed. After changing the API, run `npm run generate:api`; CI fails if
+the committed types are out of date.
+
 ### Conventions
 
 - **Commits** follow [Conventional Commits](https://www.conventionalcommits.org/)
   in the imperative mood. Scopes: `backend`, `frontend`, `ci`, `docker`;
   no scope for repository-wide changes.
 - **Versioning** follows [Semantic Versioning](https://semver.org/). The
-  version is defined only in `backend/pyproject.toml`; the application reads
-  it from the package metadata.
+  application has one version, set in `backend/pyproject.toml` and
+  `frontend/package.json`; CI checks that they match.
 - **Changes** are recorded under *Unreleased* in [CHANGELOG.md](CHANGELOG.md)
   and moved to a version section on release. Each release is tagged `vX.Y.Z`.
 - **Decisions** with lasting impact are recorded in
   [docs/decisions.md](docs/decisions.md).
-- **Code organisation:** packages are split by responsibility (`api/`,
-  `readers/`, `models/` …) while staying idiomatic Python.
+- **Code organisation:** code is split by responsibility – `api/`,
+  `readers/`, `models/` … in the backend; `api/`, `components/`, `pages/`,
+  `styles/` in the frontend – while staying idiomatic.
 
 ## Repository layout
 
 ```
 backend/    FastAPI application and tests
-frontend/   React application and tests (from 0.6.0)
+frontend/   React application and tests
 docs/       Roadmap and decision log
 ```
 

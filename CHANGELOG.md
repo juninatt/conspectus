@@ -7,6 +7,13 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Web frontend: a list of all sources and a table view per dataset, with
+  sorting, paging and clear messages for missing or unreadable sources.
+- API types for the frontend generated from the backend's OpenAPI schema.
+- Frontend CI: lint, formatting, type checks, tests and build, plus checks
+  that the API types are current and the versions match.
+
 ## [0.5.0] – 2026-11-02
 
 ### Added
