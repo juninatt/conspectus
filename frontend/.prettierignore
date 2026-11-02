@@ -1,0 +1,5 @@
+dist
+node_modules
+package-lock.json
+# Generated from the backend's OpenAPI schema
+src/api/schema.d.ts
