@@ -123,3 +123,20 @@ def test_check_type_reports_first_mismatch(
 
     assert error.value.row == row
     assert error.value.reason == reason
+
+
+def test_explicit_boolean_accepts_zero_and_one() -> None:
+    check_type([0, 1, None, True], ColumnType.BOOLEAN)
+
+    assert convert(1, ColumnType.BOOLEAN) is True
+    assert convert(0, ColumnType.BOOLEAN) is False
+
+
+@pytest.mark.parametrize("value", [2, 1.0, "1"])
+def test_explicit_boolean_rejects_other_values(value: Scalar) -> None:
+    with pytest.raises(TypeMismatch):
+        check_type([value], ColumnType.BOOLEAN)
+
+
+def test_zero_and_one_are_not_inferred_as_boolean() -> None:
+    assert infer_type([0, 1, 1]) == ColumnType.INTEGER

@@ -1,4 +1,4 @@
-"""Column types for formats without a schema, such as JSON.
+"""Column types for values whose type is not known up front, such as JSON.
 
 Inference rules:
 - Missing values (None) are ignored when inferring; a column of only missing
@@ -9,7 +9,9 @@ Inference rules:
 - Any other mix of types makes the column a string column.
 
 A type can also be set explicitly. Then every value must fit it, otherwise
-check_type reports the first value that does not.
+check_type reports the first value that does not. An explicit boolean type
+also accepts 0 and 1, as stored by databases without a boolean type; these
+are never inferred as booleans, since they are usually counts.
 """
 
 import json
@@ -60,7 +62,7 @@ def infer_type(values: Sequence[Scalar]) -> ColumnType:
 def check_type(values: Sequence[Scalar], column_type: ColumnType) -> None:
     """Raise TypeMismatch unless every value fits the given column type."""
     for number, value in enumerate(values, start=1):
-        if value is not None and not _fits(value, column_type):
+        if value is not None and not _fits(value, column_type, explicit=True):
             raise TypeMismatch(number, f"{value!r} is not a valid {column_type}")
     present = [value for value in values if value is not None]
     if column_type is ColumnType.DATETIME and _mixes_time_zones(present):
@@ -76,6 +78,8 @@ def convert(value: Scalar, column_type: ColumnType) -> Value:
             return value if isinstance(value, str) else json.dumps(value)
         case ColumnType.NUMBER:
             return float(value)
+        case ColumnType.BOOLEAN:
+            return bool(value)
         case ColumnType.DATE if isinstance(value, str):
             return date.fromisoformat(value)
         case ColumnType.DATETIME if isinstance(value, str):
@@ -84,12 +88,16 @@ def convert(value: Scalar, column_type: ColumnType) -> Value:
             return value
 
 
-def _fits(value: str | int | float | bool, column_type: ColumnType) -> bool:
+def _fits(
+    value: str | int | float | bool, column_type: ColumnType, explicit: bool = False
+) -> bool:
     match column_type:
         case ColumnType.STRING:
             return True
         case ColumnType.BOOLEAN:
-            return isinstance(value, bool)
+            return isinstance(value, bool) or (
+                explicit and isinstance(value, int) and value in (0, 1)
+            )
         case ColumnType.INTEGER:
             return isinstance(value, int) and not isinstance(value, bool)
         case ColumnType.NUMBER:
