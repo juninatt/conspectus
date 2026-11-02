@@ -7,6 +7,18 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- `GET /sources` lists all configured sources.
+- `GET /datasets/{id}` returns the columns and rows of a source, with
+  optional paging through `limit` and `offset`.
+- Clear API errors: 404 for unknown sources, 422 for sources that cannot be
+  read.
+- Datasets are cached and re-read only when their file changes.
+
+### Changed
+- The source configuration is loaded at startup; the application does not
+  start if it is missing or invalid.
+
 ## [0.3.0] – 2026-11-02
 
 ### Added

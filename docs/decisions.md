@@ -143,3 +143,28 @@ fields turns typos into errors instead of silent misconfiguration. Checking
 data files lazily lets Conspectus start before producers have written their
 files. Overrides are strict because an explicitly stated type is a promise
 about the data, unlike inference, which is deliberately lenient.
+
+## 012 – Dataset API, caching and errors (2026-11-02)
+**Decision:**
+- `GET /sources` lists every configured source; `GET /datasets/{id}` returns
+  columns, rows (one object per row) and `total_rows`.
+- Paging with `limit` and `offset` is supported from the start. Without them
+  all rows are returned.
+- A dataset is cached in memory after the first read and re-read when the
+  file's modification time or size changes.
+- Errors use FastAPI's `{"detail": "..."}` shape: 404 for an unknown id,
+  422 for a source that cannot be read. One failing source never affects
+  the others.
+- The configuration is loaded when the application starts; a missing or
+  invalid configuration stops startup with a message.
+
+**Why:** Paging is cheap to add now but would change the API contract later,
+after the frontend depends on it. Caching on file changes keeps responses
+fast without ever serving stale data and without a separate refresh step.
+404 and 422 separate "this id does not exist" – likely after a rename – from
+"the data is broken", which need different fixes. Loading the configuration
+at startup surfaces mistakes immediately instead of on the first request.
+
+**Known limitations:** error details include local file paths, which is
+fine for local use but must be revisited before a public deployment. All
+rows of a dataset are held in memory, and paging slices that in-memory list.

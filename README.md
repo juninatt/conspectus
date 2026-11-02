@@ -96,6 +96,40 @@ uv run fastapi dev src/conspectus/main.py
 The API is then available at <http://localhost:8000>, with interactive
 documentation at <http://localhost:8000/docs>.
 
+## API
+
+Interactive documentation for all endpoints is served at `/docs`.
+
+| Endpoint | Returns |
+|----------|---------|
+| `GET /health` | `{"status": "ok"}` when the service is running |
+| `GET /sources` | All configured sources: `id`, `name`, `description`, `format` |
+| `GET /datasets/{id}` | Columns and rows of one source |
+
+`/datasets/{id}` accepts `limit` and `offset` for paging; without them all
+rows are returned. `total_rows` always counts every row:
+
+```json
+{
+  "id": "weather-stations",
+  "name": "Weather stations",
+  "columns": [{"name": "temperature", "type": "number", "nullable": true}],
+  "rows": [{"timestamp": "2026-10-01T08:00:00", "temperature": 12.5}],
+  "total_rows": 3
+}
+```
+
+Errors have the form `{"detail": "..."}`:
+
+| Status | Meaning |
+|--------|---------|
+| `404` | No source with that id – for example after a source was renamed |
+| `422` | The source exists but cannot be read; `detail` names the file, row and column |
+
+A source that cannot be read never affects the others. Data files are read
+on first request and cached until the file changes, so responses stay fast
+and always reflect the current file.
+
 ## Configuring sources
 
 Sources are listed in `backend/sources.yaml`. The file is local and not
