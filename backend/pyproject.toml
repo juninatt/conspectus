@@ -1,6 +1,6 @@
 [project]
 name = "conspectus"
-version = "0.2.0"
+version = "0.3.0"
 description = "Reads tabular data from configurable sources and serves it over a REST API."
 authors = [{ name = "Petter Bergström" }]
 license = "MIT"
