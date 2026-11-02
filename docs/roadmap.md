@@ -11,7 +11,7 @@ Before 1.0.0 the API may still change between minor versions.
 | 0.1.0 ✅ | Backend skeleton: FastAPI, health check, test and quality tooling | Tests, lint and type checks |
 | 0.2.0 ✅ | Dataset model (columns, types, rows) and JSON reader with column type detection | Unit tests against sample files |
 | 0.3.0 ✅ | Source configuration: load and validate `sources.yaml`, with optional per-column type overrides | Tests for valid and invalid configuration |
-| 0.4.0 | API: list sources, fetch a dataset by id | API tests, manual check via `/docs` |
+| 0.4.0 ✅ | API: list sources, fetch a dataset by id | API tests, manual check via `/docs` |
 | 0.5.0 | SQLite reader behind the same reader interface | Existing API tests pass with a SQLite source |
 | 0.6.0 | Frontend skeleton: dataset list and table view | Vitest, manual check in the browser |
 | 0.7.0 | Charts (line, bar …) with selectable axis columns | Vitest, manual check in the browser |
