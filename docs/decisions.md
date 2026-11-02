@@ -188,3 +188,32 @@ and failures easy to locate.
 outside `backend/`. If its check is later made required for merging, pull
 requests that don't touch the backend would wait for it forever; that
 setup must then be adjusted.
+
+## 014 – SQLite reader (2026-11-02)
+**Decision:**
+- A SQLite source reads either a `table` or the result of a `query` –
+  exactly one of them.
+- Databases are opened read-only (`mode=ro`).
+- Declared column types `BOOLEAN`/`BOOL`, `DATE` and `DATETIME`/`TIMESTAMP`
+  are used as hints when every value fits them; otherwise, and for all
+  other columns and every query result, types are inferred. Explicit types
+  in the configuration still take precedence, and an explicit `boolean`
+  accepts 0 and 1.
+- `BLOB` values are rejected with an error naming the column.
+- Readers report which files they depend on, and the cache watches all of
+  them. For SQLite that is the database and its `-wal` file.
+- Type selection and conversion are shared by all readers.
+
+**Why:** A query lets users join, filter and aggregate in the database
+without changing the producing application, while a table covers the
+common case with no SQL at all. Opening read-only makes "Conspectus never
+modifies source data" a guarantee enforced by SQLite rather than a
+promise. SQLite does not enforce declared types, so only declarations that
+carry information the values cannot (0/1 meaning boolean, text meaning a
+date) are trusted, and only when the data agrees. In WAL mode new rows are
+written to the `-wal` file first, so watching only the database file would
+serve stale data. Sharing the type logic keeps JSON and SQLite behaving
+identically.
+
+**Known limitation:** all rows are loaded into memory; `limit` and
+`offset` are not yet pushed down into SQL.

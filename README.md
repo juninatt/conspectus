@@ -35,9 +35,11 @@ frontend (React + TypeScript): dataset list, tables, charts, dashboards
 
 | Format | Status |
 |--------|--------|
-| Tabular JSON – a list of flat objects, one per row | Reader available (0.2.0) |
-| SQLite | Planned (0.5.0) |
+| Tabular JSON – a list of flat objects, one per row | Supported |
+| SQLite – a table or the result of a query | Supported |
 | CSV | Planned |
+
+### JSON
 
 Example of tabular JSON:
 
@@ -53,9 +55,26 @@ Example of tabular JSON:
 - Nested objects or lists inside a row are not supported; the file is
   rejected with an error naming the row and column.
 
+### SQLite
+
+A source reads either a whole `table` or the result of a `query`. The
+database is opened **read-only**, so not even a mistaken query can change
+it; the producing application keeps writing as usual, and new rows show up
+on the next request.
+
+- Declared column types `BOOLEAN`/`BOOL`, `DATE` and `DATETIME`/`TIMESTAMP`
+  are used when every value fits them, since SQLite stores booleans as 0/1
+  and dates as text. All other columns – and every column of a query
+  result – get their types inferred.
+- Binary (`BLOB`) values are not supported; select other columns with a
+  query instead.
+- Databases in WAL mode are handled: changes are picked up even before they
+  reach the main database file.
+
 ### Column types
 
-Formats without a schema, such as JSON, get their column types inferred:
+Column types are inferred from the values unless the format declares them
+or they are set in the configuration:
 
 | Type | Inferred when all values are … |
 |------|--------------------------------|
@@ -68,7 +87,8 @@ Formats without a schema, such as JSON, get their column types inferred:
 
 Missing values are ignored when inferring, and mark the column as nullable.
 Only ISO 8601 dates are recognised – ambiguous formats like `01/10/2026` stay
-strings rather than being guessed.
+strings rather than being guessed. Values 0 and 1 are never inferred as
+booleans, but are accepted when a column is explicitly typed `boolean`.
 
 ## Tech stack
 
@@ -152,8 +172,10 @@ sources:
 |-------|----------|---------|
 | `name` | yes | Display name. The source id is derived from it. |
 | `description` | no | Free text. |
-| `format` | yes | Data format. Supported: `json`. |
+| `format` | yes | Data format: `json` or `sqlite`. |
 | `path` | yes | Data file. Relative paths are resolved from the folder of `sources.yaml`; `~` is expanded. |
+| `table` | sqlite | Table to read. Set either `table` or `query`. |
+| `query` | sqlite | SQL query whose result is the dataset. |
 | `columns` | no | Column name → type, overriding inference. Every value must fit the type, or reading the source fails with an error naming the row. |
 
 The **id** is the name in lowercase, with accents removed and anything other

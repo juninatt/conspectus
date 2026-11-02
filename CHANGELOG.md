@@ -11,6 +11,16 @@ and the project follows [Semantic Versioning](https://semver.org/).
 - Continuous integration: tests, lint, formatting and type checks run on
   GitHub Actions for every push to `main` and every pull request that
   touches the backend.
+- SQLite sources: read a whole table or the result of a query. Databases
+  are opened read-only.
+- Declared SQLite column types for booleans, dates and date-times are used
+  when the values fit them.
+- A column explicitly typed `boolean` accepts 0 and 1.
+- Example SQLite database with a table source and a query source.
+
+### Changed
+- Cached datasets are refreshed when any file their reader depends on
+  changes, so updates to SQLite databases in WAL mode are picked up.
 
 ## [0.4.0] – 2026-11-02
 
