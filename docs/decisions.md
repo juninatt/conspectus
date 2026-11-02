@@ -168,3 +168,23 @@ at startup surfaces mistakes immediately instead of on the first request.
 **Known limitations:** error details include local file paths, which is
 fine for local use but must be revisited before a public deployment. All
 rows of a dataset are held in memory, and paging slices that in-memory list.
+
+## 013 – Continuous integration with GitHub Actions (2026-11-02)
+**Decision:** A GitHub Actions workflow runs the same checks as local
+development – ruff lint, ruff format check, mypy and pytest – on every push
+to `main` and every pull request. It installs dependencies with
+`uv sync --locked` and only runs when files under `backend/` or the
+workflow itself change. Workflow permissions are read-only. The frontend
+will get its own workflow.
+
+**Why:** Running the local checks automatically means a broken commit is
+caught even when a local step is skipped, and the status is visible on
+every commit and in the README badge. `--locked` fails the build if
+`uv.lock` is out of date, so CI always tests the exact dependency versions
+that are committed. One workflow per part of the repository keeps runs fast
+and failures easy to locate.
+
+**Note:** because the workflow is path-filtered, it does not run for changes
+outside `backend/`. If its check is later made required for merging, pull
+requests that don't touch the backend would wait for it forever; that
+setup must then be adjusted.

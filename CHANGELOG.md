@@ -7,6 +7,11 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Continuous integration: tests, lint, formatting and type checks run on
+  GitHub Actions for every push to `main` and every pull request that
+  touches the backend.
+
 ## [0.4.0] – 2026-11-02
 
 ### Added

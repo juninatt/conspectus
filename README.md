@@ -1,5 +1,7 @@
 # Conspectus
 
+[![Backend](https://github.com/juninatt/conspectus/actions/workflows/backend.yml/badge.svg)](https://github.com/juninatt/conspectus/actions/workflows/backend.yml)
+
 *Latin: "overview".*
 
 Conspectus reads data that other applications produce – files and databases
@@ -173,7 +175,8 @@ since the producing application may not have written them yet. Changes to
 ## Development
 
 All commands run from `backend/`. All checks must pass before a change is
-committed.
+committed. The same checks run in CI (GitHub Actions) on every push to
+`main` and every pull request that touches the backend.
 
 ```bash
 uv run pytest            # tests
