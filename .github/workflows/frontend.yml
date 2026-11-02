@@ -1,0 +1,77 @@
+name: Frontend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      # The API types are generated from the backend, and the versions must match.
+      - "backend/src/**"
+      - "backend/pyproject.toml"
+      - ".github/workflows/frontend.yml"
+  pull_request:
+    paths:
+      - "frontend/**"
+      - "backend/src/**"
+      - "backend/pyproject.toml"
+      - ".github/workflows/frontend.yml"
+
+permissions:
+  contents: read
+
+# A newer push to the same branch cancels the run still in progress.
+concurrency:
+  group: frontend-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Tests and quality checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      # npm ci installs exactly what package-lock.json lists.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check versions match
+        run: npm run check:version
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+
+      # Fails if the backend API changed without regenerating the types.
+      - name: Check API types are up to date
+        run: |
+          npm run generate:api
+          git diff --exit-code -- src/api/schema.d.ts
