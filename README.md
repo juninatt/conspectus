@@ -99,7 +99,7 @@ booleans, but are accepted when a column is explicitly typed `boolean`.
 | Frontend | TypeScript (strict), React, Vite, React Router |
 | Data fetching | TanStack Query, with types generated from the API's OpenAPI schema |
 | Tables   | TanStack Table |
-| Charts   | ECharts (planned) |
+| Charts   | ECharts, loaded only when a chart is opened |
 | Styling  | CSS Modules and CSS variables (design tokens) |
 | Storage  | SQLite locally, Postgres in the cloud (planned) |
 | Tooling  | uv, ruff, mypy · npm, oxlint, Prettier, Vitest, Testing Library, MSW |
@@ -167,6 +167,38 @@ Errors have the form `{"detail": "..."}`:
 A source that cannot be read never affects the others. Data files are read
 on first request and cached until the file changes, so responses stay fast
 and always reflect the current file.
+
+## Charts
+
+Each dataset can be shown as a **table** or a **chart** – switch with the
+buttons next to its name. A chart is configured in the bar above it:
+
+| Setting | Choices |
+|---------|---------|
+| Type | Line, bar or scatter |
+| X axis | Any column. Dates and date-times give a time axis, numbers a numeric axis, text and booleans one category per value. Bars over dates use one category per date. |
+| Y axis | One or more numeric columns, all on one shared axis. |
+| Group by | A text or boolean column (other than the x column): one series per value. Available with a single y column. |
+
+- **A useful chart from the start.** Time goes on the x axis if there is a
+  date column, the first numeric column on y. If x values repeat – several
+  stations measured at the same time – the chart is grouped by the first
+  text or boolean column, so each group gets its own line.
+- **Settings live in the URL**, e.g.
+  `/datasets/station-readings?view=chart&chart=line&x=recorded&y=temperature&group=station`,
+  so a chart can be bookmarked or shared. Settings that no longer fit the
+  data fall back to the defaults.
+- **Scales:** bars start at zero, since bar length encodes the value; lines
+  and points fit the data's range.
+- **Colors** come from a fixed palette of eight, assigned in order and never
+  repeated. Each group keeps its color in every chart type. Beyond eight
+  series the rest are left out, with a notice.
+- **Zoom** with the slider or the mouse wheel on time and numeric axes. The
+  zoom is kept when changing chart type or y columns, and reset when the x
+  column changes.
+- Rows are plotted as they are; there is no aggregation yet. Several values
+  for the same x, such as many readings per day in a bar chart, give several
+  bars. Aggregate in a SQLite `query` until the API supports it.
 
 ## Configuring sources
 
@@ -249,8 +281,17 @@ the committed types are out of date.
 ### Conventions
 
 - **Commits** follow [Conventional Commits](https://www.conventionalcommits.org/)
-  in the imperative mood. Scopes: `backend`, `frontend`, `ci`, `docker`;
-  no scope for repository-wide changes.
+  in the imperative mood. The scope names the feature area; changes that
+  span the whole repository have no scope.
+
+  | Part | Scopes |
+  |------|--------|
+  | Backend | `api`, `config`, `readers`, `catalog` |
+  | Frontend | `ui` (layout, styling, theme), `table`, `charts`, `dashboards` |
+  | Both | `types` (generated API types) |
+  | Infrastructure | `ci`, `docker`, `deps` (dependencies) |
+
+  Commits before 0.7.0 use the earlier scopes `backend` and `frontend`.
 - **Versioning** follows [Semantic Versioning](https://semver.org/). The
   application has one version, set in `backend/pyproject.toml` and
   `frontend/package.json`; CI checks that they match.

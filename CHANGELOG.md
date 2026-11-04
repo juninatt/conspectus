@@ -7,6 +7,19 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Chart view for every dataset: line, bar and scatter charts with
+  selectable x and y columns and optional grouping into series.
+- Choices limited to what fits each column type, and a useful default
+  chart, grouped automatically when x values repeat.
+- Chart settings in the URL, so charts can be bookmarked and shared.
+- Tooltips, a legend and zoom; the zoom is kept when changing chart type.
+- A fixed, color-vision-checked palette for chart series.
+
+### Changed
+- Commit scopes now name feature areas instead of backend and frontend.
+- The roadmap splits theming and dark mode (0.8.0) from dashboards (0.9.0).
+
 ## [0.6.0] – 2026-11-02
 
 ### Added

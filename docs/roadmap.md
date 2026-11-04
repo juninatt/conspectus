@@ -15,7 +15,8 @@ Before 1.0.0 the API may still change between minor versions.
 | 0.5.0 ✅ | CI with GitHub Actions; SQLite reader behind the same reader interface | Existing API tests pass with a SQLite source |
 | 0.6.0 ✅ | Frontend skeleton: dataset list and table view, frontend CI | Vitest, manual check in the browser |
 | 0.7.0 | Charts (line, bar …) with selectable axis columns | Vitest, manual check in the browser |
-| 0.8.0 | Dashboards: saved sets of charts and tables, theming, dark mode | Vitest, manual check in the browser |
+| 0.8.0 | Theming and dark mode: dark design tokens, a theme switch, following the system setting by default | Vitest, manual check in the browser |
+| 0.9.0 | Dashboards: stored in the backend, with an API and a UI to save and show sets of charts and tables | API tests, Vitest, manual check in the browser |
 | 1.0.0 | First complete release for local use | Full flow from source file to dashboard |
 
 ## Planned, not yet scheduled

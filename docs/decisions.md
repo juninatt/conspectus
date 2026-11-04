@@ -252,3 +252,60 @@ no CORS configuration.
 a few thousand rows. When the API gains server-side sorting and filtering,
 the table switches to requesting one page at a time; the change stays inside
 the table component.
+
+## 016 – Charts (2026-11-04)
+**Decision:**
+- ECharts, with only the needed parts registered (line, bar, scatter,
+  tooltip, legend, zoom, canvas renderer), wrapped in a small own React
+  component. The chart view is loaded only when opened.
+- Column types decide the choices: any column on x (time, value or category
+  axis by type), numeric columns on y, text and boolean columns for
+  grouping. Several y columns share one axis; grouping requires a single y
+  column and never uses the x column.
+- The default chart puts time on x and the first numeric column on y, and
+  groups by the first text or boolean column when x values repeat on a time
+  or numeric axis.
+- Settings are stored in the URL; invalid values fall back to the defaults.
+- Bars start at zero; lines and points fit the data's range. Bars over dates
+  use a category per date.
+- Series colors come from a fixed palette of eight, read from CSS
+  variables, assigned by first appearance in the data and never repeated.
+  More than eight series are left out with a notice.
+- The zoom range is kept while the x column stays the same.
+- No aggregation in the frontend.
+
+**Why:** Offering only choices that fit the column types means a chart can't
+be set up wrongly. A sensible default shows something useful at once; the
+automatic grouping prevents a line zigzagging between groups measured at
+the same time. URL settings make charts shareable and are the basis for
+saving dashboards. A zero baseline is required for bars because their
+length encodes the value, while lines and points read position. Stable
+colors per group and no repeated colors keep identity unambiguous; the
+palette order was validated for color vision deficiencies, and slots below
+3:1 contrast are backed by the legend, tooltips and the table view. Loading
+ECharts on demand keeps the source list and table at about 110 kB gzipped
+instead of about 300 kB. Aggregation belongs in the backend, next to
+filtering, rather than being duplicated in the browser.
+
+**Known limitations:** several y columns with different units share one
+scale; separate charts – possible with dashboards – read better. The 8-series
+cap is per chart.
+
+## 017 – Commit scopes by feature area (2026-11-04)
+**Decision:** From 0.7.0 on, the commit scope names the feature area –
+`api`, `config`, `readers`, `catalog`, `ui`, `table`, `charts`,
+`dashboards`, `types`, `ci`, `docker`, `deps` – instead of `backend` or
+`frontend`. Earlier history is left as it is.
+
+**Why:** The history becomes searchable by feature (`git log --grep
+"(charts)"`), and the subject no longer has to repeat what the scope could
+say.
+
+## 018 – Theming before dashboards (2026-11-04)
+**Decision:** The former 0.8.0 is split: theming and dark mode become 0.8.0,
+dashboards 0.9.0.
+
+**Why:** Dark mode is frontend-only and builds directly on the design
+tokens, while dashboards introduce the first stored data – a database,
+migrations and a new API. Two smaller releases are easier to test, and
+dashboards are then built on a finished theme system.
