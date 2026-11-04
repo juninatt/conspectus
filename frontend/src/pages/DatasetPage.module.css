@@ -16,8 +16,35 @@
 
 .header {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.views {
+  display: flex;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.views button {
+  padding: var(--space-1) var(--space-4);
+  border: 0;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.views button + button {
+  border-left: 1px solid var(--color-border);
+}
+
+.views button[aria-pressed='true'] {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-weight: 600;
 }
 
 .header h1 {
