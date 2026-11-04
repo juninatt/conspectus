@@ -15,6 +15,23 @@
   --color-danger: #a12a2a;
   --color-danger-soft: #fbeaea;
 
+  /*
+   * Chart series colors, assigned in this fixed order and never cycled.
+   * The order keeps neighbouring series distinguishable with color vision
+   * deficiencies (validated against the surface color). Slots 3–5 are below
+   * 3:1 contrast, so charts always pair them with a legend, tooltips and the
+   * table view.
+   */
+  --chart-series-1: #2a78d6;
+  --chart-series-2: #eb6834;
+  --chart-series-3: #1baf7a;
+  --chart-series-4: #eda100;
+  --chart-series-5: #e87ba4;
+  --chart-series-6: #008300;
+  --chart-series-7: #6250d6;
+  --chart-series-8: #e34948;
+  --chart-grid: #eceef1;
+
   --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-mono: ui-monospace, 'Cascadia Code', Consolas, monospace;
   --font-size-sm: 0.8125rem;
