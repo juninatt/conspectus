@@ -7,6 +7,8 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.7.0] – 2026-11-04
+
 ### Added
 - Chart view for every dataset: line, bar and scatter charts with
   selectable x and y columns and optional grouping into series.
@@ -91,7 +93,8 @@ and the project follows [Semantic Versioning](https://semver.org/).
 - Tooling for tests, linting, formatting and strict type checking.
 - README, decision log and MIT license.
 
-[Unreleased]: https://github.com/juninatt/Conspectus/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/juninatt/Conspectus/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/juninatt/Conspectus/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/juninatt/Conspectus/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/juninatt/Conspectus/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/juninatt/Conspectus/compare/v0.3.0...v0.4.0
