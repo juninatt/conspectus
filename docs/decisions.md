@@ -309,3 +309,32 @@ dashboards 0.9.0.
 tokens, while dashboards introduce the first stored data – a database,
 migrations and a new API. Two smaller releases are easier to test, and
 dashboards are then built on a finished theme system.
+
+## 019 – Theming and dark mode (2026-11-05)
+**Decision:**
+- Three choices: light, dark and system, with system as the default. The
+  choice is stored in the browser's `localStorage`.
+- The theme is applied as a `data-theme` attribute on `<html>`; the dark
+  theme redefines the design tokens and sets `color-scheme`, so native
+  controls follow.
+- An inline script in `index.html` applies the stored theme before the app
+  loads.
+- Dark colors are chosen, not inverted. The chart palette keeps its eight
+  hues in dark steps, validated against the dark surface.
+- A test enforces WCAG AA contrast for text colors in both themes.
+- Charts read their colors from the tokens again after a theme change; the
+  theme is applied in a layout effect so it is in place before they read.
+
+**Why:** Following the system respects the user's existing setting, while
+an explicit choice is still possible. A preference is personal, so it does
+not belong in shareable URLs, and without accounts there is nowhere else to
+keep it; it can move to the server once users can sign in. Switching tokens
+with one attribute means components never need to know about themes. The
+inline script avoids the common flash of a light page before the dark theme
+applies. Keeping hues across themes preserves series identity, and an
+automated contrast check stops a later color change from quietly making
+text hard to read.
+
+**Known limitation:** the preference is per browser. The inline script
+repeats a few lines of the theme logic, since it has to run before the app's
+code; both places are marked to be kept in sync.

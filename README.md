@@ -100,7 +100,7 @@ booleans, but are accepted when a column is explicitly typed `boolean`.
 | Data fetching | TanStack Query, with types generated from the API's OpenAPI schema |
 | Tables   | TanStack Table |
 | Charts   | ECharts, loaded only when a chart is opened |
-| Styling  | CSS Modules and CSS variables (design tokens) |
+| Styling  | CSS Modules and CSS variables (design tokens), light and dark theme |
 | Storage  | SQLite locally, Postgres in the cloud (planned) |
 | Tooling  | uv, ruff, mypy · npm, oxlint, Prettier, Vitest, Testing Library, MSW |
 
@@ -199,6 +199,23 @@ buttons next to its name. A chart is configured in the bar above it:
 - Rows are plotted as they are; there is no aggregation yet. Several values
   for the same x, such as many readings per day in a bar chart, give several
   bars. Aggregate in a SQLite `query` until the API supports it.
+
+## Themes
+
+The switch in the header chooses **Light**, **Dark** or **System**. System
+is the default and follows the operating system, also when it changes while
+the app is open. The choice is remembered in the browser.
+
+- All colors are design tokens in
+  [`tokens.css`](frontend/src/styles/tokens.css); the dark theme redefines
+  them under `[data-theme='dark']`, so components need no theme logic.
+- Dark colors are chosen for dark backgrounds rather than inverted. Charts
+  keep the same eight hues, stepped and validated for the dark surface, so a
+  series keeps its color identity in both themes.
+- A test checks that every text color meets WCAG AA contrast (4.5:1) on the
+  backgrounds it is used on, in both themes.
+- A small script in `index.html` applies the theme before the app loads, so
+  the dark theme never flashes white.
 
 ## Configuring sources
 

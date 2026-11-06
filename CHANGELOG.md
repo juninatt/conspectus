@@ -7,6 +7,16 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Dark theme, with a switch between light, dark and following the system.
+- The chosen theme is remembered and applied before the page renders, so
+  there is no white flash.
+- Charts switch to a dark palette of the same hues when the theme changes.
+- A test that checks text contrast against WCAG AA in both themes.
+
+### Changed
+- Chart tooltips and line markers follow the theme colors.
+
 ## [0.7.0] – 2026-11-04
 
 ### Added
