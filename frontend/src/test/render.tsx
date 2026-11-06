@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter, useLocation } from 'react-router'
 
 import { App } from '../App'
+import { ThemeProvider } from '../theme/ThemeProvider'
 
 /** Renders the whole app at `path`, with a fresh query cache and no retries. */
 export function renderApp(path = '/') {
@@ -10,12 +11,14 @@ export function renderApp(path = '/') {
     defaultOptions: { queries: { retry: false } },
   })
   return render(
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={[path]}>
-        <App />
-        <LocationProbe />
-      </MemoryRouter>
-    </QueryClientProvider>,
+    <ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={[path]}>
+          <App />
+          <LocationProbe />
+        </MemoryRouter>
+      </QueryClientProvider>
+    </ThemeProvider>,
   )
 }
 

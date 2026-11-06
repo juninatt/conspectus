@@ -7,16 +7,19 @@ import { BrowserRouter } from 'react-router'
 
 import { createQueryClient } from './api/queries'
 import { App } from './App'
+import { ThemeProvider } from './theme/ThemeProvider'
 
 const root = document.getElementById('root')
 if (root === null) throw new Error('Missing #root element')
 
 createRoot(root).render(
   <StrictMode>
-    <QueryClientProvider client={createQueryClient()}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </QueryClientProvider>
+    <ThemeProvider>
+      <QueryClientProvider client={createQueryClient()}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ThemeProvider>
   </StrictMode>,
 )
