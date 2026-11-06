@@ -22,6 +22,9 @@ Before 1.0.0 the API may still change between minor versions.
 ## Planned, not yet scheduled
 
 - **CSV reader.** Parquet or similar only if data volumes require it.
+- **PostgreSQL reader** (after 1.0.0, if still wanted): read a table or a
+  query from a PostgreSQL database through a read-only database role, so
+  producers that already store their data in Postgres need no export step.
 - **Filtering and aggregation** in the API.
 - **Docker** images for backend and frontend.
 - **Cloud deployment** with Postgres and authentication.
