@@ -1,8 +1,12 @@
 /*
  * Design tokens: every color, size and font used by the app is defined here,
  * so themes (including dark mode) only need to redefine these variables.
+ * Text colors are checked for WCAG AA contrast in both themes by a test.
  */
 :root {
+  /* Native controls (selects, checkboxes, scrollbars) follow the theme. */
+  color-scheme: light;
+
   --color-bg: #f6f7f9;
   --color-surface: #ffffff;
   --color-surface-muted: #f0f2f5;
@@ -50,4 +54,27 @@
   --radius-md: 8px;
   --shadow-sm: 0 1px 2px rgb(16 24 40 / 6%);
   --content-width: 72rem;
+}
+
+/*
+ * Dark theme: chosen values, not an inversion of the light ones. Surfaces
+ * get lighter as they come forward, and accent colors are lightened so they
+ * keep their contrast on dark backgrounds.
+ */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-bg: #121417;
+  --color-surface: #1a1d21;
+  --color-surface-muted: #22262b;
+  --color-border: #343a42;
+  --color-text: #e6e9ed;
+  --color-text-muted: #a1aab5;
+  --color-accent: #8cb8e8;
+  --color-accent-hover: #abcdf2;
+  --color-accent-soft: #1d3149;
+  --color-danger: #f29191;
+  --color-danger-soft: #3b2023;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 40%);
 }

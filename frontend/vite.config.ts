@@ -19,5 +19,7 @@ export default defineConfig({
     // Generous, so the first test in a file passes on a busy machine too.
     testTimeout: 15_000,
     setupFiles: ['./src/test/setup.ts'],
+    // CSS is skipped in tests, except the design tokens, which a test reads.
+    css: { include: [/tokens\.css/] },
   },
 })
