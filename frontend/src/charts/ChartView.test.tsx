@@ -4,15 +4,20 @@ import { http, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { DatasetResponse } from '../api/client'
+import tokensCss from '../styles/tokens.css?raw'
 import { currentSearch, renderApp } from '../test/render'
 import { apiUrl, server } from '../test/server'
 import type { ChartOption } from './echarts'
 
 // ECharts draws on a canvas, which the test environment lacks. The stand-in
-// exposes what would be drawn: the description and the series names.
+// exposes what would be drawn: the description, series names and colors.
 vi.mock('./Chart', () => ({
   Chart: ({ option, label }: { option: ChartOption; label: string }) => (
-    <div role="img" aria-label={label}>
+    <div
+      role="img"
+      aria-label={label}
+      data-colors={(option.color as string[]).join(' ')}
+    >
       {(option.series as { name: string }[]).map((series) => (
         <span key={series.name}>series: {series.name}</span>
       ))}
@@ -191,5 +196,25 @@ describe('ChartView', () => {
     renderApp('/datasets/readings?view=chart')
 
     expect(await screen.findByText('Nothing to chart')).toBeInTheDocument()
+  })
+})
+
+describe('ChartView theme', () => {
+  beforeEach(() => serve(readings))
+
+  it('redraws with the dark palette when the theme changes', async () => {
+    const style = document.createElement('style')
+    style.textContent = tokensCss
+    document.head.append(style)
+    renderApp('/datasets/readings?view=chart')
+    const firstColor = async () =>
+      (await chart()).getAttribute('data-colors')?.split(' ')[0]
+
+    expect(await firstColor()).toBe('#2a78d6')
+
+    await userEvent.click(screen.getByRole('button', { name: 'Dark' }))
+
+    expect(await firstColor()).toBe('#3987e5')
+    style.remove()
   })
 })

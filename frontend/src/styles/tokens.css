@@ -76,5 +76,16 @@
   --color-danger: #f29191;
   --color-danger-soft: #3b2023;
 
+  /* The same eight hues, stepped for the dark surface and validated there. */
+  --chart-series-1: #3987e5;
+  --chart-series-2: #d95926;
+  --chart-series-3: #199e70;
+  --chart-series-4: #c98500;
+  --chart-series-5: #d55181;
+  --chart-series-6: #008300;
+  --chart-series-7: #9085e9;
+  --chart-series-8: #e66767;
+  --chart-grid: #2a2f35;
+
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 40%);
 }

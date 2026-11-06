@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router'
 
 import type { Column, Row } from '../api/client'
 import { StatusMessage } from '../components/StatusMessage'
+import { useTheme } from '../theme/context'
 import { Chart } from './Chart'
 import { buildChartModel, type ChartSettings, MAX_SERIES } from './chartOptions'
 import { ChartSettingsBar } from './ChartSettingsBar'
@@ -22,7 +23,16 @@ export function ChartView({ columns, rows }: Props) {
     () => readChartSettings(params, columns, rows),
     [params, columns, rows],
   )
-  const theme = useMemo(() => readChartTheme(), [])
+  // Chart colors come from the design tokens, so they are read again when
+  // the theme changes – after the new theme has been applied to the page.
+  const { theme: activeTheme } = useTheme()
+  const [theme, setTheme] = useState(readChartTheme)
+  useEffect(() => {
+    // Reads the page's computed styles – state from outside React, which is
+    // what effects are for – so the extra render is intended.
+    // oxlint-disable-next-line react/set-state-in-effect
+    setTheme(readChartTheme())
+  }, [activeTheme])
   // The zoom belongs to an x column: kept when only the chart type or the
   // y columns change, dropped when x changes and the old range means nothing.
   const [zoom, setZoom] = useState<{ x: string; range: ZoomRange } | null>(null)

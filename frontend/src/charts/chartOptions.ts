@@ -122,13 +122,17 @@ export function buildChartModel(
     legend: showLegend
       ? { top: 0, icon: 'roundRect', textStyle: { color: theme.text } }
       : { show: false },
-    tooltip:
-      settings.type === 'scatter'
+    tooltip: {
+      backgroundColor: theme.surface,
+      borderColor: theme.axis,
+      textStyle: { color: theme.text },
+      ...(settings.type === 'scatter'
         ? { trigger: 'item' }
         : {
             trigger: 'axis',
             axisPointer: { type: settings.type === 'bar' ? 'shadow' : 'line' },
-          },
+          }),
+    },
     xAxis: {
       type: kind,
       name: settings.x,
@@ -220,6 +224,9 @@ function seriesOption(type: ChartType, name: string, data: Point[]) {
         name,
         data,
         lineStyle: { width: 2 },
+        // Filled markers: the default hollow ones have a white center that
+        // stands out on a dark background.
+        symbol: 'circle',
         symbolSize: 8,
         // Markers on every point clutter long series.
         showSymbol: data.length <= 50,

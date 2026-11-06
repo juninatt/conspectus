@@ -269,3 +269,10 @@ describe('y axis range', () => {
     expect(scale('scatter')).toBe(true)
   })
 })
+
+it('colors the tooltip from the theme', () => {
+  expect(model({}).option.tooltip).toMatchObject({
+    backgroundColor: theme.surface,
+    textStyle: { color: theme.text },
+  })
+})
