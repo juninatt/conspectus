@@ -7,6 +7,8 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.8.0] – 2026-11-06
+
 ### Added
 - Dark theme, with a switch between light, dark and following the system.
 - The chosen theme is remembered and applied before the page renders, so
@@ -103,7 +105,8 @@ and the project follows [Semantic Versioning](https://semver.org/).
 - Tooling for tests, linting, formatting and strict type checking.
 - README, decision log and MIT license.
 
-[Unreleased]: https://github.com/juninatt/Conspectus/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/juninatt/Conspectus/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/juninatt/Conspectus/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/juninatt/Conspectus/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/juninatt/Conspectus/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/juninatt/Conspectus/compare/v0.4.0...v0.5.0
